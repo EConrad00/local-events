@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
-using Server.Events;
+//using Server.Events;
 using Scalar.AspNetCore;
+using Server.Events;
 
 // Create the web application builder
 var builder = WebApplication.CreateBuilder(args);
@@ -55,7 +56,7 @@ app.MapGet("/", () => "Local Events API is running!")
 
 app.MapGet("/api/health", () => new { 
        status = "healthy", 
-       timestamp = DateTime.UtcNow,
+       timestamp = DateTime.Today,
        version = "1.0.0",
        environment = app.Environment.EnvironmentName
    })
@@ -95,15 +96,7 @@ app.MapGet("/api/events/{id:int}", (int id) => {
                Title = "Konstutställning i Gamla Stan",
                Description = "En fantastisk utställning med lokala konstnärer",
                StartDate = DateTime.Today.AddDays(7),
-               EndDate = DateTime.Today.AddDays(7).AddHours(6),
                Location = "Galleri Stockholm",
-               Address = "Gamla Stan 15",
-               City = "Stockholm",
-               PostalCode = "11129",
-               Price = (decimal?)null,
-               IsFree = true,
-               OrganizerName = "Stockholms Konstförening",
-               OrganizerEmail = "info@konstforening.se"
            });
        }
        return Results.NotFound(new { message = $"Event with id {id} not found" });
@@ -116,8 +109,10 @@ app.MapGet("/api/events/{id:int}", (int id) => {
    .Produces<object>(404);
 
 // Register CRUD endpoints
-app.MapCreateEventEndpoints();
-app.MapCreateCategoryEndpoints();
+CreateCategoryEndpoints.MapEndpoint(app);
+CreateEventEndpoints.MapEndpoint(app);
+//look at making a endpointmaker!!!
+
 
 // Start the server
 app.Run();

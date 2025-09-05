@@ -1,41 +1,48 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
+using Server._internal;
 
 namespace Server.Events;
 
-public class CreateEventRequest
+public class CreateEventEndpoints : IEndpoint
 {
-    [Required]
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    [Required]
-    public DateTime DateTime { get; set; }
-    public string Location { get; set; } = string.Empty;
-}
-
-public static class CreateEventEndpoints
-{
-    public static void MapCreateEventEndpoints(this IEndpointRouteBuilder app)
-    {
-        app.MapPost("/api/events", async (CreateEventRequest request, AppDbContext db) =>
-        {
-            var newEvent = new Event
-            {
-                Name = request.Name,
-                Description = request.Description,
-                DateTime = request.DateTime,
-                Location = request.Location
-            };
-
-            db.Events.Add(newEvent);
-            await db.SaveChangesAsync();
-
-            return Results.Created($"/api/events/{newEvent.Id}", newEvent);
-        })
+    public static void MapEndpoint(IEndpointRouteBuilder app) => app
+        .MapPost("/api/events", Handle)
         .WithName("CreateEvent")
         .WithSummary("Create a new event")
         .WithTags("Events")
         .Produces<Event>(201);
+
+    public record CreateEventRequest(
+        string Name,
+        string Description,
+        DateTime DateTime,
+        string Location
+    );
+
+    public record CreateEventResponse(
+        int Id
+    );
+
+    private static async Task<IResult> Handle(CreateEventRequest request, AppDbContext dbContext)
+    {
+        var newEvent = new Event
+        {
+            Name = request.Name,
+            Description = request.Description,
+            DateTime = request.DateTime,
+            Location = request.Location
+        };
+
+        dbContext.Events.Add(newEvent);
+        await dbContext.SaveChangesAsync();
+
+        var response = new CreateEventResponse(
+            newEvent.Id
+        );
+    
+        return Results.Created($"/api/events/{newEvent.Id}", response);
     }
 }

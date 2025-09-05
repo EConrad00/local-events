@@ -1,31 +1,43 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Server.Data;
+using Server._internal;
 
 namespace Server.Events;
 
-
-public class CreateCategoryRequest
+public class CreateCategoryEndpoints : IEndpoint
 {
-    [Required]
-    public string Name { get; set; } = string.Empty;
-}
-public static class CreateCategoryEndpoints
-{
-    public static void MapCreateCategoryEndpoints(this IEndpointRouteBuilder app)
-    {
-        app.MapPost("/api/categories", async (CreateCategoryRequest request, AppDbContext db) =>
-        {
-            var newCategory = new Category
-            {
-                Name = request.Name
-            };
-            db.Categories.Add(newCategory);
-            await db.SaveChangesAsync();
-            return Results.Created($"/api/categories/{newCategory.Id}", newCategory);
-        })
+    public static void MapEndpoint(IEndpointRouteBuilder app) => app
+        .MapPost("/api/categories", Handle)
         .WithName("CreateCategory")
         .WithSummary("Create a new Category")
         .WithTags("Categories")
         .Produces<Category>(201);
+    
+    public record CreateCategoryRequest(
+        string Name
+    );
+
+    public record CreateCategoryResponse(
+        int Id
+    );
+
+    private static async Task<IResult> Handle(CreateCategoryRequest request, AppDbContext dbContext)
+    {
+        
+        var newCategory = new Category
+        {
+            Name = request.Name
+        };
+
+        dbContext.Categories.Add(newCategory);
+        await dbContext.SaveChangesAsync();
+
+        var response = new CreateCategoryResponse(
+            newCategory.Id
+        );
+
+        return Results.Created($"/api/categories/{newCategory.Id}", response);
     }
+    
 }
