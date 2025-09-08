@@ -112,6 +112,7 @@ app.MapGet("/api/health", () => new {
 //DELETE / api / categories / 1;
 // Register CRUD endpoints
 CreateEventEndpoints.MapEndpoint(app);
+DeleteEventEndpoints.MapEndpoint(app);
 GetEventEndpoints.MapEndpoint(app);
 
 CreateCategoryEndpoints.MapEndpoint(app);
