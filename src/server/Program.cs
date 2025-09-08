@@ -107,19 +107,16 @@ app.MapGet("/api/events/{id:int}", (int id) => {
    .WithTags("Events")
    .Produces<object>(200)
    .Produces<object>(404);
-app.MapGet("/api/categories", () => new[] {
-    new {
-        Id = 1,
-        Name = "Outside"
-    }
-});
+
 
 //DELETE / api / categories / 1;
 // Register CRUD endpoints
-CreateCategoryEndpoints.MapEndpoint(app);
 CreateEventEndpoints.MapEndpoint(app);
+
+CreateCategoryEndpoints.MapEndpoint(app);
 DeleteCategoryEndpoints.MapEndpoint(app);
 UpdateCategoryEndpoints.MapEndpoint(app);
+GetCategoryEndpoints.MapEndpoint(app);
 //look at making a endpointmaker!!!
 
 
