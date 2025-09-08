@@ -7,7 +7,7 @@ namespace Server.Events;
 public class UpdateEventEndpoints : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app) => app
-        .MapPut("/api/events/{id:int}", Handler)
+        .MapPatch("/api/events/{id:int}", Handler)
         .WithName("UpdateEvent")
         .WithSummary("Update a Event")
         .WithTags("Events")
@@ -44,6 +44,7 @@ public class UpdateEventEndpoints : IEndpoint
         }
         UpdatedEvent.Name = request.Name;
         UpdatedEvent.Location = request.Location;
+        UpdatedEvent.Description = request.Description;
         dbContext.Events.Update(UpdatedEvent);
         await dbContext.SaveChangesAsync();
 

@@ -16,8 +16,11 @@ public class GetEventEndpoints : IEndpoint
         .Produces(404);
 
     public record GetEventResponse(
-        int Id,
+       int Id,
         string Name,
+        string Description,
+        DateTime DateTime,
+        string Location,
         ICollection<Category> EventCategories
     );
 
@@ -35,6 +38,9 @@ public class GetEventEndpoints : IEndpoint
         var response = new GetEventResponse(
             GetEvent.Id,
             GetEvent.Name,
+            GetEvent.Description,
+            GetEvent.DateTime,
+            GetEvent.Location,
             GetEvent.Categories
         );
         
