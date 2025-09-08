@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
-//using Server.Events;
 using Scalar.AspNetCore;
 using Server.Events;
 
@@ -113,6 +112,7 @@ app.MapGet("/api/health", () => new {
 // Register CRUD endpoints
 CreateEventEndpoints.MapEndpoint(app);
 DeleteEventEndpoints.MapEndpoint(app);
+UpdateEventEndpoints.MapEndpoint(app);
 GetEventEndpoints.MapEndpoint(app);
 
 CreateCategoryEndpoints.MapEndpoint(app);
