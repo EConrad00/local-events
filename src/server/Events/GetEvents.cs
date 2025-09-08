@@ -21,7 +21,12 @@ public class GetEventEndpoints : IEndpoint
         string Description,
         DateTime DateTime,
         string Location,
-        ICollection<Category> EventCategories
+        IEnumerable<CategoryDto> Categories
+    );
+    
+    public record CategoryDto(
+        int Id,
+        string Name
     );
 
     private static async Task<IResult> Handler(int id, AppDbContext dbContext)
@@ -41,9 +46,12 @@ public class GetEventEndpoints : IEndpoint
             GetEvent.Description,
             GetEvent.DateTime,
             GetEvent.Location,
-            GetEvent.Categories
+            GetEvent.Categories.Select(category => new CategoryDto(
+                category.Id,
+                category.Name
+            ))
         );
-        
+
         return Results.Ok(response);
     }
 }

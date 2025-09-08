@@ -18,7 +18,15 @@ public class GetCategoryEndpoints : IEndpoint
     public record GetCategoryResponse(
         int Id,
         string Name,
-        ICollection<Event> EventCategories
+        IEnumerable<EventDto> Events
+    );
+    
+    public record EventDto(
+        int Id,
+        string Name,
+        string Description,
+        DateTime DateTime,
+        string Location
     );
 
     private static async Task<IResult> Handler(int id, AppDbContext dbContext)
@@ -35,9 +43,15 @@ public class GetCategoryEndpoints : IEndpoint
         var response = new GetCategoryResponse(
             GetCategory.Id,
             GetCategory.Name,
-            GetCategory.Events
+            GetCategory.Events.Select(eventGet => new EventDto(
+                eventGet.Id,
+                eventGet.Name,
+                eventGet.Description,
+                eventGet.DateTime,
+                eventGet.Location
+            ))
         );
-        
+
         return Results.Ok(response);
     }
 }

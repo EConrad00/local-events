@@ -1,6 +1,7 @@
 using Server.Data;
 using Server._internal;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace Server.Events;
 
@@ -18,9 +19,9 @@ public class UpdateEventEndpoints : IEndpoint
     public record UpdateEventRequest(
         string Name,
         string Description,
-        DateTime DateTime,
+        DateTime? DateTime,
         string Location,
-        ICollection<Category> EventCategories
+        int[]? CategoryId
     );
 
     public record UpdateEventResponse(
@@ -29,34 +30,63 @@ public class UpdateEventEndpoints : IEndpoint
         string Description,
         DateTime DateTime,
         string Location,
-        ICollection<Category> EventCategories
+        IEnumerable<CategoryDto> Categories
+    );
+
+    public record CategoryDto(
+        int Id,
+        string Name
     );
 
     private static async Task<IResult> Handler(int id, UpdateEventRequest request, AppDbContext dbContext)
     {
-        var UpdatedEvent = await dbContext.Events
+        var ExistingEvent = await dbContext.Events
             .Include(e => e.Categories)
             .FirstOrDefaultAsync(e => e.Id == id);
 
-        if (UpdatedEvent == null)
+        if (ExistingEvent == null)
         {
-            return Results.NotFound(new { Message = $"Category with ID {id} not found." });
+            return Results.NotFound(new { Message = $"Event with ID {id} not found." });
         }
-        UpdatedEvent.Name = request.Name;
-        UpdatedEvent.Location = request.Location;
-        UpdatedEvent.Description = request.Description;
-        dbContext.Events.Update(UpdatedEvent);
+
+        var UpdatedEvent = new Event
+        {
+            Id = id,
+            Name = request.Name ?? ExistingEvent.Name,
+            Description = request.Description ?? ExistingEvent.Description,
+            DateTime = request.DateTime ?? ExistingEvent.DateTime,
+            Location = request.Location ?? ExistingEvent.Location
+            //Categories = request.EventCategories ?? ExistingEvent.Categories
+        };
+
+        if (request.CategoryId != null)
+        {
+            ExistingEvent.Categories.Clear();
+            var newCategories = await dbContext.Categories
+                .Where(c => request.CategoryId.Contains(c.Id))
+                .ToListAsync();
+
+            foreach (var category in newCategories)
+            {
+                ExistingEvent.Categories.Add(category);
+            }
+        }
+
+        dbContext.Entry(ExistingEvent).CurrentValues.SetValues(UpdatedEvent);
         await dbContext.SaveChangesAsync();
 
         var response = new UpdateEventResponse(
-            UpdatedEvent.Id,
-            UpdatedEvent.Name,
-            UpdatedEvent.Description,
-            UpdatedEvent.DateTime,
-            UpdatedEvent.Location,
-            UpdatedEvent.Categories
+            ExistingEvent.Id,
+            ExistingEvent.Name,
+            ExistingEvent.Description,
+            ExistingEvent.DateTime,
+            ExistingEvent.Location,
+            ExistingEvent.Categories.Select(category => new CategoryDto(
+                category.Id,
+                category.Name
+            ))
         );
-        
+
         return Results.Ok(response);
     }
 }
