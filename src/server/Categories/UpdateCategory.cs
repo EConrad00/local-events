@@ -20,8 +20,28 @@ public class UpdateCategoryEndpoints : IEndpoint
     );
 
     public record UpdateCategoryResponse(
-        int Id
+        int Id,
+        string Name
     );
 
-    
+    private static async Task<IResult> Handler(int id, UpdateCategoryRequest request, AppDbContext dbContext)
+    {
+        var Updatedcategory = await dbContext.Categories
+            .FindAsync(id);
+
+        if (Updatedcategory == null)
+        {
+            return Results.NotFound(new { Message = $"Category with ID {id} not found." });
+        }
+        Updatedcategory.Name = request.Name;
+        dbContext.Categories.Update(Updatedcategory);
+        await dbContext.SaveChangesAsync();
+
+        var response = new UpdateCategoryResponse(
+            Updatedcategory.Id,
+            Updatedcategory.Name
+        );
+        
+        return Results.Ok(response);
+    }
 }

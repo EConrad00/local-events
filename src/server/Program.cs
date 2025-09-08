@@ -119,6 +119,7 @@ app.MapGet("/api/categories", () => new[] {
 CreateCategoryEndpoints.MapEndpoint(app);
 CreateEventEndpoints.MapEndpoint(app);
 DeleteCategoryEndpoints.MapEndpoint(app);
+UpdateCategoryEndpoints.MapEndpoint(app);
 //look at making a endpointmaker!!!
 
 
