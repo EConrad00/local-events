@@ -19,7 +19,8 @@ public class CreateEventEndpoints : IEndpoint
         string Name,
         string Description,
         DateTime DateTime,
-        string Location
+        string Location,
+        int[]? CategoryId
     );
 
     public record CreateEventResponse(
@@ -35,6 +36,20 @@ public class CreateEventEndpoints : IEndpoint
             DateTime = request.DateTime,
             Location = request.Location
         };
+
+        // Connect to categories if provided
+        if (request.CategoryId != null && request.CategoryId.Length > 0)
+        {
+            var categories = await dbContext.Categories
+                .Where(c => request.CategoryId.Contains(c.Id))
+                .ToListAsync();
+
+            // Add each category to the event's Categories collection
+            foreach (var category in categories)
+            {
+                newEvent.Categories.Add(category);
+            }
+        }
 
         dbContext.Events.Add(newEvent);
         await dbContext.SaveChangesAsync();
