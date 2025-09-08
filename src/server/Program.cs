@@ -67,51 +67,52 @@ app.MapGet("/api/health", () => new {
    .Produces<object>(200);
 
 // Sample Events endpoint for testing
-app.MapGet("/api/events", () => new[] {
-       new {
-           Id = 1,
-           Title = "Konstutställning i Gamla Stan",
-           Description = "En fantastisk utställning med lokala konstnärer",
-           StartDate = DateTime.Today.AddDays(7),
-           Location = "Galleri Stockholm",
-       },
-       new {
-           Id = 2,
-           Title = "Yoga i parken",
-           Description = "Gratis yoga för alla nivåer",
-           StartDate = DateTime.Today.AddDays(3),
-           Location = "Tantolunden",
-       }
-   })
-   .WithName("GetEvents")
-   .WithSummary("Get all events")
-   .WithDescription("Returns a list of all local events")
-   .WithTags("Events")
-   .Produces<object[]>(200);
+// app.MapGet("/api/events", () => new[] {
+//        new {
+//            Id = 1,
+//            Title = "Konstutställning i Gamla Stan",
+//            Description = "En fantastisk utställning med lokala konstnärer",
+//            StartDate = DateTime.Today.AddDays(7),
+//            Location = "Galleri Stockholm",
+//        },
+//        new {
+//            Id = 2,
+//            Title = "Yoga i parken",
+//            Description = "Gratis yoga för alla nivåer",
+//            StartDate = DateTime.Today.AddDays(3),
+//            Location = "Tantolunden",
+//        }
+//    })
+//    .WithName("GetEvents")
+//    .WithSummary("Get all events")
+//    .WithDescription("Returns a list of all local events")
+//    .WithTags("Events")
+//    .Produces<object[]>(200);
 
-app.MapGet("/api/events/{id:int}", (int id) => {
-       if (id == 1) {
-           return Results.Ok(new {
-               Id = 1,
-               Title = "Konstutställning i Gamla Stan",
-               Description = "En fantastisk utställning med lokala konstnärer",
-               StartDate = DateTime.Today.AddDays(7),
-               Location = "Galleri Stockholm",
-           });
-       }
-       return Results.NotFound(new { message = $"Event with id {id} not found" });
-   })
-   .WithName("GetEventById")
-   .WithSummary("Get event by ID")
-   .WithDescription("Returns a specific event by its ID")
-   .WithTags("Events")
-   .Produces<object>(200)
-   .Produces<object>(404);
+// app.MapGet("/api/events/{id:int}", (int id) => {
+//        if (id == 1) {
+//            return Results.Ok(new {
+//                Id = 1,
+//                Title = "Konstutställning i Gamla Stan",
+//                Description = "En fantastisk utställning med lokala konstnärer",
+//                StartDate = DateTime.Today.AddDays(7),
+//                Location = "Galleri Stockholm",
+//            });
+//        }
+//        return Results.NotFound(new { message = $"Event with id {id} not found" });
+//    })
+//    .WithName("GetEventById")
+//    .WithSummary("Get event by ID")
+//    .WithDescription("Returns a specific event by its ID")
+//    .WithTags("Events")
+//    .Produces<object>(200)
+//    .Produces<object>(404);
 
 
 //DELETE / api / categories / 1;
 // Register CRUD endpoints
 CreateEventEndpoints.MapEndpoint(app);
+GetEventEndpoints.MapEndpoint(app);
 
 CreateCategoryEndpoints.MapEndpoint(app);
 DeleteCategoryEndpoints.MapEndpoint(app);
