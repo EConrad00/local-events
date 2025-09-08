@@ -5,11 +5,11 @@ namespace Server.Events;
 
 public class Category
 {
-    [Key]
+  [Key]
   public int Id{ get; set;}
 
-    [Required]
-    public string Name { get; set; } = String.Empty;
+  [Required]
+  public string Name { get; set; } = String.Empty;
 
   public ICollection<Event> Events { get; } = new List<Event>();
 }
