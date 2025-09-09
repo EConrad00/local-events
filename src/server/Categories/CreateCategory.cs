@@ -19,7 +19,8 @@ public class CreateCategoryEndpoints : IEndpoint
     );
 
     public record CreateCategoryResponse(
-        int Id
+        int Id,
+        string Name
     );
 
     private static async Task<IResult> Handle(CreateCategoryRequest request, AppDbContext dbContext)
@@ -34,7 +35,8 @@ public class CreateCategoryEndpoints : IEndpoint
         await dbContext.SaveChangesAsync();
 
         var response = new CreateCategoryResponse(
-            newCategory.Id
+            newCategory.Id,
+            newCategory.Name
         );
 
         return Results.Created($"/api/categories/{newCategory.Id}", response);

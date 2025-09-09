@@ -1,10 +1,10 @@
 <script>
     import { onMount } from 'svelte';
     import {writable} from 'svelte/store';
-    import {categories1,addCategory,deleteCategory,updateCategory,setCategories} from '$lib/stores'
+    import {categories, addCategory, deleteCategory, updateCategory, setCategories} from '$lib/stores'
 
 	let events = [];
-	let categories = [];
+	//let categories = [];
 	// Form data for new event
 	let eventName = '';
 	let eventDescription = '';
@@ -12,10 +12,10 @@
 	let eventLocation = '';
 	let selectedCategoryIds = [];
 	
-    let categoryname = '';
-    let newCategoryName='';
+    let categoryName = '';
+    let newCategoryName ='';
     let editingCategory = null;
-    let editingCategoryName= '';
+    let editingCategoryName = '';
 	
 	function formatLocalDateTime(dateTimeString) {
         if(!dateTimeString) return 'TBD';
@@ -69,12 +69,30 @@
 		}
 	}
 
+    async function createCategory() {
+        
+        const response = await fetch('api/categories', { method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+                    name : categoryName
+                })
+        });
+        const newCategory = await response.json();
+
+        addCategory(newCategory)
+        categoryName = "";
+
+        alert("Category created")
+    }
+
     onMount(async () => {
         // Fetch events
         try {
             const eventsResponse = await fetch('/api/events');
             if (eventsResponse.ok) {
-                events = eventsResponse.json();
+                events = await eventsResponse.json();
             }
         } catch (err) {
             console.error('Error fetching events:', err);
@@ -84,7 +102,7 @@
         try {
             const categoriesResponse = await fetch('/api/categories');
             if (categoriesResponse.ok) {
-                const categoriesData = categoriesResponse.json();
+                const categoriesData = await categoriesResponse.json();
                 setCategories(categoriesData);
             }
         } catch (err) {
@@ -111,9 +129,9 @@
 {/if}
 
 <h2>Categories</h2>
-{#if categories.length > 0}
+{#if $categories.length > 0}
     <ul>
-        {#each categories as category}
+        {#each $categories as category}
             <li>{category.name}</li>
         {/each}
     </ul>
@@ -122,6 +140,21 @@
 {/if}
 
 <hr>
+
+<h2>Add New Category</h2>
+<form on:submit|preventDefault={createCategory}>
+    <div>
+        <label for="categoryName">Category Name:</label>
+        <input 
+            type="text" 
+            id="categoryName" 
+            bind:value={categoryName} 
+            required 
+            placeholder="Enter category name"
+        >
+    </div>
+    <button type="submit">Create Category</button>
+</form>
 
 <h2>Add New Event</h2>
 <form on:submit|preventDefault={submitEvent}>
@@ -201,7 +234,7 @@
         font-weight: bold;
     }
     
-    input, textarea, select {
+    input, textarea {
         width: 100%;
         padding: 8px;
         border: 1px solid #ccc;

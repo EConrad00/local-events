@@ -6,27 +6,27 @@ import { writable } from 'svelte/store';
 export const events = writable([]);
 
 // Categories store
-export const categories1 = writable([]);
+export const categories = writable([]);
 
 
-export const addCategory = (categories1) => {
-	categories1.update(currentCategories => [...currentCategories, categories1]);
+export const addCategory = (Addcategories) => {
+	categories.update(currentCategories => [...currentCategories, Addcategories]);
 };
 
-export const updateCategory = (id,updateCategory) => {
-	categories1.update(currentCategories =>
+export const updateCategory = (id, updateCategories) => {
+	categories.update(currentCategories =>
 		currentCategories.map(category =>
-			category.id === id ? { ...category, ...updatedCategory } : category
+			category.id === id ? { ...category, ...updatedCategories } : category
 		)
 	)
 }
 
 export const deleteCategory = (id) => {
-	categories1.update(currenmtCategories =>
+	categories.update(currentCategories =>
 		currentCategories.filter(category => category.id !== id)
 	)
 }
 
 export const setCategories = (categoriesList) => {
-	categories1.set(categoriesList);
+	categories.set(categoriesList);
 }
