@@ -6,15 +6,33 @@ namespace Server.Events;
 
 public class GetEventEndpoints : IEndpoint
 {
-    public static void MapEndpoint(IEndpointRouteBuilder app) => app
-        .MapGet("/api/events/{id:int}", Handler)
-        .WithName("GetEvent")
-        .WithSummary("Get a event")
-        .WithTags("Events")
-        .Produces<Event>(201)
-        .Produces(204)
-        .Produces(404);
+    // public static void MapEndpoint(IEndpointRouteBuilder app) => app
+    //     .MapGet("/api/events/{id:int}", Handler)
+    //     .WithName("GetEvent")
+    //     .WithSummary("Get a event")
+    //     .WithTags("Events")
+    //     .Produces<Event>(201)
+    //     .Produces(204)
+    //     .Produces(404);
 
+    public static void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        // Get all events
+        app.MapGet("/api/events", GetAllHandler)
+            .WithName("GetAllEvents")
+            .WithSummary("Get all events")
+            .WithTags("Events")
+            .Produces<IEnumerable<GetEventResponse>>(200);
+
+        // Get single event by ID
+        app.MapGet("/api/events/{id:int}", Handler)
+            .WithName("GetEvent")
+            .WithSummary("Get a event")
+            .WithTags("Events")
+            .Produces<Event>(201)
+            .Produces(204)
+            .Produces(404);
+    }
     public record GetEventResponse(
        int Id,
         string Name,
@@ -29,6 +47,26 @@ public class GetEventEndpoints : IEndpoint
         string Name
     );
 
+    private static async Task<IResult> GetAllHandler(AppDbContext dbContext)
+    {
+        var events = await dbContext.Events
+            .Include(e => e.Categories)
+            .ToListAsync();
+
+        var response = events.Select(eventItem => new GetEventResponse(
+            eventItem.Id,
+            eventItem.Name,
+            eventItem.Description,
+            eventItem.DateTime,
+            eventItem.Location,
+            eventItem.Categories.Select(category => new CategoryDto(
+                category.Id,
+                category.Name
+            ))
+        ));
+
+        return Results.Ok(response);
+    }
     private static async Task<IResult> Handler(int id, AppDbContext dbContext)
     {
         var GetEvent = await dbContext.Events
