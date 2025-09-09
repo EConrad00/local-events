@@ -23,7 +23,6 @@ public class GetEventEndpoints : IEndpoint
             .WithSummary("Get all events")
             .WithTags("Events")
             .Produces<IEnumerable<GetEventResponse>>(200);
-
         // Get single event by ID
         app.MapGet("/api/events/{id:int}", Handler)
             .WithName("GetEvent")

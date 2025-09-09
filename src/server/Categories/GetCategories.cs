@@ -47,7 +47,27 @@ public class GetCategoryEndpoints : IEndpoint
         string Location
     );
 
-    private static async Task<IResult> Handler(int id, AppDbContext dbContext)
+    private static async Task<IResult> GetAllHandler(AppDbContext dbContext)
+    {
+        var categories = await dbContext.Categories
+            .Include(c => c.Events)
+            .ToListAsync();
+
+        var response = categories.Select(categoryItem => new GetCategoryResponse(
+            categoryItem.Id,
+            categoryItem.Name,
+            categoryItem.Events.Select(eventGet => new EventDto(
+                eventGet.Id,
+                eventGet.Name,
+                eventGet.Description,
+                eventGet.DateTime,
+                eventGet.Location
+            ))
+        ));
+
+        return Results.Ok(response);
+    }
+private static async Task<IResult> Handler(int id, AppDbContext dbContext)
     {
         var GetCategory = await dbContext.Categories
             .Include(c => c.Events)
@@ -69,26 +89,6 @@ public class GetCategoryEndpoints : IEndpoint
                 eventGet.Location
             ))
         );
-
-        return Results.Ok(response);
-    }
-    private static async Task<IResult> GetAllHandler(AppDbContext dbContext)
-    {
-        var categories = await dbContext.Categories
-            .Include(c => c.Events)
-            .ToListAsync();
-
-        var response = categories.Select(categoryItem => new GetCategoryResponse(
-            categoryItem.Id,
-            categoryItem.Name,
-            categoryItem.Events.Select(eventGet => new EventDto(
-                eventGet.Id,
-                eventGet.Name,
-                eventGet.Description,
-                eventGet.DateTime,
-                eventGet.Location
-            ))
-        ));
 
         return Results.Ok(response);
     }
