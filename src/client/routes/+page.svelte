@@ -1,19 +1,21 @@
 <script>
     import { onMount } from 'svelte';
+    import {writable} from 'svelte/store';
+    import {categories1,addCategory,deleteCategory,updateCategory,setCategories} from '$lib/stores'
 
 	let events = [];
 	let categories = [];
-
 	// Form data for new event
 	let eventName = '';
 	let eventDescription = '';
 	let eventDateTime = '';
 	let eventLocation = '';
 	let selectedCategoryIds = [];
-	let eventCategory = '';
-
-
-
+	
+    let categoryname = '';
+    let newCategoryName='';
+    let editingCategory = null;
+    let editingCategoryName= '';
 	
 	function formatLocalDateTime(dateTimeString) {
         if(!dateTimeString) return 'TBD';
@@ -51,7 +53,7 @@
 				eventLocation = '';
 				selectedCategoryIds = [];
 
-				// Refresh events list
+				// Refresh events list 
 				const eventsResponse = await fetch('/api/events');
 				if (eventsResponse.ok) {
 					events = await eventsResponse.json();
@@ -72,7 +74,7 @@
         try {
             const eventsResponse = await fetch('/api/events');
             if (eventsResponse.ok) {
-                events = await eventsResponse.json();
+                events = eventsResponse.json();
             }
         } catch (err) {
             console.error('Error fetching events:', err);
@@ -82,7 +84,8 @@
         try {
             const categoriesResponse = await fetch('/api/categories');
             if (categoriesResponse.ok) {
-                categories = await categoriesResponse.json();
+                const categoriesData = categoriesResponse.json();
+                setCategories(categoriesData);
             }
         } catch (err) {
             console.error('Error fetching categories:', err);
