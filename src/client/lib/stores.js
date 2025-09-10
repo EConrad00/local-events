@@ -14,6 +14,12 @@ export const setEvents = (eventsList) => {
 	events.set(eventsList);
 };
 
+export const deleteEvent = (id) => {
+	events.update(currentEvents=>
+		currentEvents.filter(event=> event.id !==id)
+	);
+};
+
 // Categories store
 export const categories = writable([]);
 

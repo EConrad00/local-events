@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import {writable} from 'svelte/store';
-    import {categories, addCategory, deleteCategory, updateCategory, setCategories, events, setEvents, addEvent } from '$lib/stores'
+    import {categories, addCategory, deleteCategory, updateCategory, setCategories, events, setEvents, addEvent, deleteEvent } from '$lib/stores'
     
 
 	//let events = [];
@@ -11,6 +11,7 @@
 	let eventDescription = '';
 	let eventDateTime = '';
 	let eventLocation = '';
+    let eventId = null;
 	let selectedCategoryIds = [];
 	
     let categoryName = '';
@@ -62,6 +63,19 @@
 			alert('Error creating event: ' + err.message);
 		}
 	}
+    async function deleteEvents() {
+        const response =await fetch (`/api/events/${eventId}`, { 
+                method: 'DELETE' 
+            
+            });
+             if(response.ok){
+
+                deleteEvent(parseInt(eventId));
+                
+            }
+            eventId =null;
+
+    }
 
     async function createCategory() {
         
@@ -215,15 +229,32 @@
     <div>
         <h2>Events</h2>
         {#if $events.length > 0}
-            <ul>
-                {#each $events as event}
-                    <li>
-                        <strong>{event.name}</strong> - {event.description}
-                        <br>
-                        <small>Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
-                    </li>
-                {/each}
-            </ul>
+         <div>
+            {#each $events as event}
+             <div class="checkbox-label">
+                <input 
+                    type="checkbox"
+                    checked={eventId === event.id}
+                     on:change={(e) => eventId = e.target.checked ? event.id : null}
+                >
+                <strong>{event.name}</strong> - {event.description}
+                <br>
+                <small>Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
+
+            </div>
+            
+            {/each}
+
+           </div>
+           {#if eventId !=null}
+                <button
+                    type="button"
+                    on:click={deleteEvents}
+                    class="delete-button"
+                    >
+                    Delete Selected 
+                </button>
+            {/if}
         {:else}
             <p>No events found.</p>
         {/if}
