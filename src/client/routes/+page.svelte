@@ -1,9 +1,10 @@
 <script>
     import { onMount } from 'svelte';
     import {writable} from 'svelte/store';
-    import {categories, addCategory, deleteCategory, updateCategory, setCategories} from '$lib/stores'
+    import {categories, addCategory, deleteCategory, updateCategory, setCategories, events, setEvents, addEvent } from '$lib/stores'
+    
 
-	let events = [];
+	//let events = [];
 	//let categories = [];
 	// Form data for new event
 	let eventName = '';
@@ -24,12 +25,8 @@
         return date.toLocaleString(); 
     }
 
-	// Function to submit new event
+	//Function to submit new event
 	async function submitEvent() {
-		if (!eventName || !eventDateTime || !eventLocation) {
-			alert('Please fill in all fields');
-			return;
-		}
 
 		try {
 			const response = await fetch('/api/events', {
@@ -47,23 +44,19 @@
 			});
 
 			if (response.ok) {
-				// Clear form
+				
+				const newEvents = await response.json();
+
+                addEvent(newEvents)
+
 				eventName = '';
 				eventDescription = '';
 				eventDateTime = '';
 				eventLocation = '';
 				selectedCategoryIds = [];
+				
+			} 
 
-				// Refresh events list 
-				const eventsResponse = await fetch('/api/events');
-				if (eventsResponse.ok) {
-					events = await eventsResponse.json();
-				}
-				alert('Event created successfully!');
-			} else {
-				const error = await response.text();
-				alert('Error creating event: ' + error);
-			}
 		} catch (err) {
 			console.error('Error creating event:', err);
 			alert('Error creating event: ' + err.message);
@@ -134,7 +127,8 @@
         try {
             const eventsResponse = await fetch('/api/events');
             if (eventsResponse.ok) {
-                events = await eventsResponse.json();
+                const eventsData = await eventsResponse.json();
+                setEvents(eventsData);
             }
         } catch (err) {
             console.error('Error fetching events:', err);
@@ -220,9 +214,9 @@
     </div>
     <div>
         <h2>Events</h2>
-        {#if events.length > 0}
+        {#if $events.length > 0}
             <ul>
-                {#each events as event}
+                {#each $events as event}
                     <li>
                         <strong>{event.name}</strong> - {event.description}
                         <br>

@@ -24,7 +24,13 @@ public class CreateEventEndpoints : IEndpoint
     );
 
     public record CreateEventResponse(
-        int Id
+        int Id,
+        string Name,
+        string Description,
+        DateTime DateTime,
+        string Location
+       
+
     );
 
     private static async Task<IResult> Handle(CreateEventRequest request, AppDbContext dbContext)
@@ -55,7 +61,12 @@ public class CreateEventEndpoints : IEndpoint
         await dbContext.SaveChangesAsync();
 
         var response = new CreateEventResponse(
-            newEvent.Id
+            newEvent.Id,
+            newEvent.Name,
+            newEvent.Description,
+            newEvent.DateTime,
+            newEvent.Location
+            
         );
     
         return Results.Created($"/api/events/{newEvent.Id}", response);

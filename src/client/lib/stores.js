@@ -5,6 +5,15 @@ import { writable } from 'svelte/store';
 // Events store
 export const events = writable([]);
 
+export const addEvent = (addEvents) => {
+  events.update(currentEvents => [...currentEvents, addEvents]);
+};
+
+
+export const setEvents = (eventsList) => {
+	events.set(eventsList);
+};
+
 // Categories store
 export const categories = writable([]);
 
@@ -30,3 +39,4 @@ export const deleteCategory = (id) => {
 export const setCategories = (categoriesList) => {
 	categories.set(categoriesList);
 };
+
