@@ -102,6 +102,33 @@
         selectedCategoriesForDelete = [];
     }
 
+    async function alterCategory() {
+        try {
+            const categoryId = editingCategory;
+            const response = await fetch(`/api/categories/${categoryId}`, {
+                method : 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name : editingCategoryName
+                })
+            });
+
+            if(response.ok){
+
+                const alteredCategory = await response.json();
+        
+                updateCategory(parseInt(alteredCategory.id), {name : alteredCategory.name})
+                editingCategoryName = "";
+                editingCategory = null;
+            }
+        } catch (err) {
+            console.error('Error fetching category')
+            alert(err.message);
+        }
+    }
+
     onMount(async () => {
         // Fetch events
         try {
@@ -141,6 +168,11 @@
                     bind:group={selectedCategoriesForDelete}
                 >
                 {category.name}
+                <input 
+                type="checkbox"
+                value={category.id}
+                bind:group={editingCategory}
+                >
             </div>
             {/each}
         </div>
@@ -152,6 +184,17 @@
                     >
                     Delete Selected ({selectedCategoriesForDelete.length})
                 </button>
+            {/if}
+            {#if editingCategory > 0}
+                <form on:submit|preventDefault={alterCategory}>
+                        <input 
+                        type="text"  
+                        bind:value={editingCategoryName} 
+                        required 
+                        placeholder={editingCategoryName}
+                        >
+                        <button type="submit">Update Category</button>
+                    </form>
             {/if}
         {:else}
         <p>No categories found.</p>
