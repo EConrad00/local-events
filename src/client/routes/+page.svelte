@@ -16,6 +16,7 @@
     let newCategoryName ='';
     let editingCategory = null;
     let editingCategoryName = '';
+    let selectedCategoriesForDelete = [];
 	
 	function formatLocalDateTime(dateTimeString) {
         if(!dateTimeString) return 'TBD';
@@ -71,7 +72,8 @@
 
     async function createCategory() {
         
-        const response = await fetch('api/categories', { method: 'POST',
+        const response = await fetch('/api/categories', { 
+                method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
@@ -84,7 +86,20 @@
         addCategory(newCategory)
         categoryName = "";
 
-        alert("Category created")
+        //alert("Category created")
+    }
+
+    async function deleteCategories() {
+        for(const categoryId of selectedCategoriesForDelete){
+            const response = await fetch(`/api/categories/${categoryId}`, { 
+                method: 'DELETE'
+        });
+            if(response.ok){
+
+                deleteCategory(parseInt(categoryId));
+            }
+        }
+        selectedCategoriesForDelete = [];
     }
 
     onMount(async () => {
@@ -112,113 +127,142 @@
 </script>
 
 <h1>Local Events</h1>
+<div class="container">
 
-<h2>Events</h2>
-{#if events.length > 0}
-    <ul>
-        {#each events as event}
-            <li>
-                <strong>{event.name}</strong> - {event.description}
-                <br>
-                <small>Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
-            </li>
-        {/each}
-    </ul>
-{:else}
-    <p>No events found.</p>
-{/if}
-
-<h2>Categories</h2>
-{#if $categories.length > 0}
-    <ul>
-        {#each $categories as category}
-            <li>{category.name}</li>
-        {/each}
-    </ul>
-{:else}
-    <p>No categories found.</p>
-{/if}
-
-<hr>
-
-<h2>Add New Category</h2>
-<form on:submit|preventDefault={createCategory}>
-    <div>
-        <label for="categoryName">Category Name:</label>
-        <input 
-            type="text" 
-            id="categoryName" 
-            bind:value={categoryName} 
-            required 
-            placeholder="Enter category name"
-        >
-    </div>
-    <button type="submit">Create Category</button>
-</form>
-
-<h2>Add New Event</h2>
-<form on:submit|preventDefault={submitEvent}>
-    <div>
-        <label for="eventName">Event Name:</label>
-        <input 
-            type="text" 
-            id="eventName" 
-            bind:value={eventName} 
-            required 
-            placeholder="Enter event name"
-        >
-    </div>
-    
-    <div>
-        <label for="eventDescription">Description:</label>
-        <textarea 
-            id="eventDescription" 
-            bind:value={eventDescription} 
-            placeholder="Enter event description"
-        ></textarea>
-    </div>
-    
-    <div>
-        <label for="eventDateTime">Date & Time:</label>
-        <input 
-            type="datetime-local" 
-            id="eventDateTime" 
-            bind:value={eventDateTime} 
-            required
-        >
-    </div>
-	
-	<div>
-        <label for="Addcategories"> Categories (optional):</label>
-        <div class="checkbox-group">
-            {#each categories as category}
-                <label class="checkbox-label">
-                    <input 
-                        type="checkbox" 
-                        value={category.id}
-                        bind:group={selectedCategoryIds}
-                    >
-                    {category.name}
-                </label>
+    <div class="left">
+        <h2>Categories</h2>
+        {#if $categories.length > 0}
+        <div>
+            {#each $categories as category}
+            <div class="checkbox-label">
+                <input
+                    type="checkbox"
+                    value={category.id}
+                    bind:group={selectedCategoriesForDelete}
+                >
+                {category.name}
+            </div>
             {/each}
         </div>
-    </div>
-	
-	<div>
-        <label for="eventLocation">Location:</label>
-        <input 
-            type="text" 
-            id="eventLocation" 
-            bind:value={eventLocation} 
-            required 
-            placeholder="Enter event location"
-        >
-    </div>
-    
-    <button type="submit">Create Event</button>
-</form>
+            {#if selectedCategoriesForDelete.length > 0}
+                <button
+                    type="button"
+                    on:click={deleteCategories}
+                    style="background: darkred; font-size: 12px"
+                    >
+                    Delete Selected ({selectedCategoriesForDelete.length})
+                </button>
+            {/if}
+        {:else}
+        <p>No categories found.</p>
+        {/if}
+        
+        <!-- <hr> -->
+        
+        <h2>Add New Category</h2>
+        <form on:submit|preventDefault={createCategory}>
+                <label for="categoryName">Category Name:</label>
+                <input 
+                type="text" 
+                id="categoryName" 
+                bind:value={categoryName} 
+                required 
+                placeholder="Enter category name"
+                >
 
+                <button type="submit">Create Category</button>
+            </form>
+        
+    </div>
+    <div>
+        <h2>Events</h2>
+        {#if events.length > 0}
+            <ul>
+                {#each events as event}
+                    <li>
+                        <strong>{event.name}</strong> - {event.description}
+                        <br>
+                        <small>Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
+                    </li>
+                {/each}
+            </ul>
+        {:else}
+            <p>No events found.</p>
+        {/if}
+        
+        <h2>Add New Event</h2>
+        <form on:submit|preventDefault={submitEvent}>
+            <div class="right">
+                <label for="eventName">Event Name:</label>
+                <input 
+                    type="text" 
+                    id="eventName" 
+                    bind:value={eventName} 
+                    required 
+                    placeholder="Enter event name"
+                >
+            </div>
+            
+            <div>
+                <label for="eventDescription">Description:</label>
+                <textarea 
+                    id="eventDescription" 
+                    bind:value={eventDescription} 
+                    placeholder="Enter event description"
+                ></textarea>
+            </div>
+            
+            <div>
+                <label for="eventDateTime">Date & Time:</label>
+                <input 
+                    type="datetime-local" 
+                    id="eventDateTime" 
+                    bind:value={eventDateTime} 
+                    required
+                >
+            </div>
+            
+            <div>
+                <label for="Addcategories"> Categories (optional):</label>
+                <div class="checkbox-group">
+                    {#each $categories as category}
+                        <label class="checkbox-label">
+                            <input 
+                                type="checkbox" 
+                                value={category.id}
+                                bind:group={selectedCategoryIds}
+                            >
+                            {category.name}
+                        </label>
+                    {/each}
+                </div>
+            </div>
+            
+            <div>
+                <label for="eventLocation">Location:</label>
+                <input 
+                    type="text" 
+                    id="eventLocation" 
+                    bind:value={eventLocation} 
+                    required 
+                    placeholder="Enter event location"
+                >
+            </div>
+            
+            <button type="submit">Create Event</button>
+        </form>
+    </div>
+</div>
 <style>
+    
+    .container{
+        display: flex;
+        gap: 200px;
+    }
+    .left{
+        width: 250px;
+    }
+
     form {
         max-width: 500px;
         margin: 20px 0;
@@ -261,11 +305,11 @@
         background-color: #0056b3;
     }
     
-    hr {
+    /* hr {
         margin: 30px 0;
         border: none;
         border-top: 1px solid #ccc;
-    }
+    } */
     
     .checkbox-group {
         display: flex;
