@@ -170,8 +170,8 @@
                 {category.name}
                 <input 
                 type="checkbox"
-                value={category.id}
-                bind:group={editingCategory}
+                checked={editingCategory === category.id}
+                on:change={(e) => editingCategory = e.target.checked ? category.id : null}
                 >
             </div>
             {/each}
@@ -180,7 +180,7 @@
                 <button
                     type="button"
                     on:click={deleteCategories}
-                    style="background: darkred; font-size: 12px"
+                    class="delete-button"
                     >
                     Delete Selected ({selectedCategoriesForDelete.length})
                 </button>
@@ -191,9 +191,9 @@
                         type="text"  
                         bind:value={editingCategoryName} 
                         required 
-                        placeholder={editingCategoryName}
+                        placeholder="Enter New Name"
                         >
-                        <button type="submit">Update Category</button>
+                        <button class="btn" type="submit" style="margin-top: 10px;">Update Category</button>
                     </form>
             {/if}
         {:else}
@@ -204,6 +204,7 @@
         
         <h2>Add New Category</h2>
         <form on:submit|preventDefault={createCategory}>
+            <div>
                 <label for="categoryName">Category Name:</label>
                 <input 
                 type="text" 
@@ -212,7 +213,7 @@
                 required 
                 placeholder="Enter category name"
                 >
-
+                </div>
                 <button type="submit">Create Category</button>
             </form>
         
@@ -312,7 +313,7 @@
     }
     
     form div {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
     
     label {
@@ -348,6 +349,23 @@
         background-color: #0056b3;
     }
     
+    .delete-button {
+        background-color: #e40505;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-top: 10px;
+        transition: background-color 0.2s ease;
+    }
+
+    
+    .delete-button:hover {
+        background-color: #9a0000;
+    }
+
     /* hr {
         margin: 30px 0;
         border: none;
