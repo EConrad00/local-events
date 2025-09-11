@@ -6,6 +6,8 @@
 <nav>
 	<a href="/">home</a>
 	<a href="/categories">category</a>
+	<a href="/events">event</a>
+	
 </nav>
 
 <svelte:head>

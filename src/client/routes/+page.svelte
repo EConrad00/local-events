@@ -2,7 +2,7 @@
 <script>
     import { onMount } from 'svelte';
     import {writable} from 'svelte/store';
-    import {categories, addCategory, deleteCategory, updateCategory, setCategories, events, setEvents, addEvent, deleteEvent } from '$lib/stores'
+    import {categories, events, setEvents, addEvent, deleteEvent } from '$lib/stores'
     import '../app.css'; // from routes/ to app.css
 
 
@@ -14,11 +14,6 @@
     let eventId = null;
 	let selectedCategoryIds = [];
 	
-    let categoryName = '';
-    let newCategoryName ='';
-    let editingCategory = null;
-    let editingCategoryName = '';
-    let selectedCategoriesForDelete = [];
 	
 	function formatLocalDateTime(dateTimeString) {
         if(!dateTimeString) return 'TBD';
@@ -26,58 +21,6 @@
         return date.toLocaleString(); 
     }
 
-	//Function to submit new event
-	async function submitEvent() {
-
-		try {
-			const response = await fetch('/api/events', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					name: eventName,
-					description: eventDescription,
-					dateTime: new Date(eventDateTime).toISOString(),
-					location: eventLocation,
-					CategoryId: selectedCategoryIds.map(id => parseInt(id))
-				})
-			});
-
-			if (response.ok) {
-				
-				const newEvents = await response.json();
-
-                addEvent(newEvents)
-
-				eventName = '';
-				eventDescription = '';
-				eventDateTime = '';
-				eventLocation = '';
-				selectedCategoryIds = [];
-				
-			} 
-
-		} catch (err) {
-			console.error('Error creating event:', err);
-			alert('Error creating event: ' + err.message);
-		}
-	}
-    async function deleteEvents() {
-        const response =await fetch (`/api/events/${eventId}`, { 
-                method: 'DELETE' 
-            
-            });
-             if(response.ok){
-
-                deleteEvent(parseInt(eventId));
-                
-            }
-            eventId =null;
-
-    }
-
-    
 
     onMount(async () => {
         // Fetch events
@@ -103,12 +46,8 @@
         {#if $events.length > 0}
          <div>
             {#each $events as event}
-             <div class="checkbox-label">
-                <input 
-                    type="checkbox"
-                    checked={eventId === event.id}
-                     on:change={(e) => eventId = e.target.checked ? event.id : null}
-                >
+             <div>
+               
                 <strong>{event.name}</strong> - {event.description}
                 <br>
                 <small>Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
@@ -117,81 +56,11 @@
             
             {/each}
 
-           </div>
-           {#if eventId !=null}
-                <button
-                    type="button"
-                    on:click={deleteEvents}
-                    class="delete-button"
-                    >
-                    Delete Selected 
-                </button>
-            {/if}
+         </div>
         {:else}
             <p>No events found.</p>
         {/if}
-        
-        <h2>Add New Event</h2>
-        <form on:submit|preventDefault={submitEvent}>
-            <div class="right">
-                <label for="eventName">Event Name:</label>
-                <input 
-                    type="text" 
-                    id="eventName" 
-                    bind:value={eventName} 
-                    required 
-                    placeholder="Enter event name"
-                >
-            </div>
-            
-            <div>
-                <label for="eventDescription">Description:</label>
-                <textarea 
-                    id="eventDescription" 
-                    bind:value={eventDescription} 
-                    placeholder="Enter event description"
-                ></textarea>
-            </div>
-            
-            <div>
-                <label for="eventDateTime">Date & Time:</label>
-                <input 
-                    type="datetime-local" 
-                    id="eventDateTime" 
-                    bind:value={eventDateTime} 
-                    required
-                >
-            </div>
-            
-            <div>
-                <label for="Addcategories"> Categories (optional):</label>
-                <div class="checkbox-group">
-                    {#each $categories as category}
-                        <label class="checkbox-label">
-                            <input 
-                                type="checkbox" 
-                                value={category.id}
-                                bind:group={selectedCategoryIds}
-                            >
-                            {category.name}
-                        </label>
-                    {/each}
-                </div>
-            </div>
-            
-            <div>
-                <label for="eventLocation">Location:</label>
-                <input 
-                    type="text" 
-                    id="eventLocation" 
-                    bind:value={eventLocation} 
-                    required 
-                    placeholder="Enter event location"
-                >
-            </div>
-            
-            <button type="submit">Create Event</button>
-        </form>
+              
     </div>
 </div>
 
