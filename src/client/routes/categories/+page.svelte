@@ -104,8 +104,18 @@
                 <button
                     type="button"
                     class="edit-pen {editingCategory === category.id ? 'active' : ''}"
-                    on:click={() => editingCategory = editingCategory === category.id ? null : category.id}  
-                >
+                    on:click={() => {
+                        if(editingCategory === category.id){
+                            editingCategory = null;
+                            editingCategoryName = '';
+                        } 
+                        else{
+                            editingCategory = category.id;
+                            editingCategoryName = category.name;
+                        }
+                    }}  
+                    >
+                    <!-- editingCategory = editingCategory === category.id ? null : category.id -->
                     ✏️
             </button>
             </div>

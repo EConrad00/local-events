@@ -97,7 +97,13 @@
 
                 const alteredEvent = await response.json();
         
-                updateEvent(parseInt(alteredEvent.id), {name : alteredEvent.name, description : alteredEvent.description, dateTime : alteredEvent.dateTime, location : alteredEvent.location, CategoryId : alteredEvent.CategoryId})
+                updateEvent(parseInt(alteredEvent.id), {
+                    name : alteredEvent.name, 
+                    description : alteredEvent.description,
+                    dateTime : alteredEvent.dateTime, 
+                    location : alteredEvent.location, 
+                    categories : alteredEvent.categories || []
+                })
                 editingEventName = "";
                 //editingEvent = null;
             }
@@ -138,7 +144,15 @@
                 >
                 <strong>{event.name}</strong> - {event.description}
                 <br>
-                <small>Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
+                <small> | Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
+                <br>
+                <small> | Categories: 
+                    {#if event.categories && event.categories.length > 0}
+                        {event.categories.map(cat => cat.name).join(', ')}
+                    {:else}
+                        No categories
+                    {/if}
+                </small>
                 <button
                     type="button"
                     class="edit-pen {editingEvent === event.id ? 'active' : ''}"
@@ -241,8 +255,6 @@
         {:else}
             <p>No events found.</p>
         {/if}
-        {#if 0 > 1}
-            
         
         <h2>Add New Event</h2>
         <form on:submit|preventDefault={submitEvent}>
@@ -305,7 +317,6 @@
             
             <button type="submit">Create Event</button>
         </form>
-        {/if}
     </div>
 </div>
 
