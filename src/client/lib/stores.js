@@ -19,6 +19,13 @@ export const deleteEvent = (id) => {
 		currentEvents.filter(event=> event.id !==id)
 	);
 };
+export const updateEvent = (id, updatedEvents) => {
+	events.update(currentEvents =>
+		currentEvents.map(event=>
+			event.id === id ? {...event, ...updatedEvents} : event
+		) 
+	);
+};
 
 // Categories store
 export const categories = writable([]);

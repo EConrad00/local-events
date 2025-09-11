@@ -2,8 +2,8 @@
 <script>
     import { onMount } from 'svelte';
     import {writable} from 'svelte/store';
-    import {categories, events, setEvents, addEvent, deleteEvent } from '$lib/stores'
-    import '../../app.css'; // from routes/ to app.css
+    import {categories, events, setEvents, addEvent, deleteEvent, updateEvent } from '$lib/stores'
+    import '../../app.css'; 
 
 
 	// Form data for new event
@@ -13,6 +13,9 @@
 	let eventLocation = '';
     let eventId = null;
 	let selectedCategoryIds = [];
+    let editingEvent = null;
+    let editingEventName = null;
+    let edetingEventDescription = null;
 	
 	
 	function formatLocalDateTime(dateTimeString) {
@@ -71,7 +74,34 @@
             eventId =null;
 
     }
+    async function alterEvents(){
+            const eventIds = editingEvent;
+            const response =await fetch (`/api/events/${eventIds}`, { 
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+					name: editingEventName,
+					description: edetingEventDescription,
+					dateTime: new Date(eventDateTime),
+					location: eventLocation,
+					CategoryId: selectedCategoryIds.map(id => parseInt(id))
+				})
+            
+            });
+             if(response.ok){
+                alert ("was here")
 
+                const alteredEvent = await response.json();
+        
+                updateEvent(parseInt(alteredEvent.id), {name : alteredEvent.name})
+                editingEventName = "";
+                //editingEvent = null;
+            }
+            editingEvent =null;
+    }
+    
     
 
     onMount(async () => {
@@ -107,6 +137,13 @@
                 <strong>{event.name}</strong> - {event.description}
                 <br>
                 <small>Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
+            <button
+                    type="button"
+                    class="edit-pen {editingEvent === event.id ? 'active' : ''}"
+                    on:click={() => editingEvent = editingEvent === event.id ? null : event.id}  
+                >
+                    ✏️
+            </button>
 
             </div>
             
@@ -121,6 +158,17 @@
                     >
                     Delete Selected 
                 </button>
+            {/if}
+             {#if editingEvent > 0}
+                <form on:submit|preventDefault={alterEvents}>
+                        <input 
+                        type="text"  
+                        bind:value={editingEventName} 
+                        required 
+                        placeholder="Enter New Name"
+                        >
+                        <button class="btn" type="submit" style="margin-top: 10px;">Update Category</button>
+                    </form>
             {/if}
         {:else}
             <p>No events found.</p>
