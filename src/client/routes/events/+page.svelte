@@ -140,7 +140,15 @@
             <button
                     type="button"
                     class="edit-pen {editingEvent === event.id ? 'active' : ''}"
-                    on:click={() => editingEvent = editingEvent === event.id ? null : event.id}  
+                    on:click={() => {
+                        if (editingEvent === event.id) {
+                            editingEvent = null;
+                            editingEventName = '';
+                        } else {
+                            editingEvent = event.id;
+                            editingEventName = event.name;
+                        }
+                    }}
                 >
                     ✏️
             </button>
@@ -165,7 +173,7 @@
                         type="text"  
                         bind:value={editingEventName} 
                         required 
-                        placeholder="Enter New Name"
+                        placeholder="Enter new event name"
                         >
                         <button class="btn" type="submit" style="margin-top: 10px;">Update Category</button>
                     </form>
