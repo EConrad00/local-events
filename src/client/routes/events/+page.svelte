@@ -15,10 +15,10 @@
 	let selectedCategoryIds = [];
     let editingEvent = null;
     let editingEventName = null;
-    let edetingEventDescription = null;
-    let edetingEventDateTime = null;
-    let edetingEventLocation = null;
-    let edetingEventCategoryIds = [];
+    let editingEventDescription = null;
+    let editingEventDateTime = null;
+    let editingEventLocation = null;
+    let editingEventCategoryIds = [];
 	
 	
 	function formatLocalDateTime(dateTimeString) {
@@ -86,10 +86,10 @@
                 },
                 body: JSON.stringify({
 					name: editingEventName,
-					description: edetingEventDescription,
-					dateTime: new Date(eventDateTime),
-					location: eventLocation,
-					CategoryId: selectedCategoryIds.map(id => parseInt(id))
+					description: editingEventDescription,
+					dateTime: new Date(editingEventDateTime),
+					location: editingEventLocation,
+					CategoryId: editingEventCategoryIds.map(id => parseInt(id))
 				})
             
             });
@@ -147,17 +147,17 @@
                         if (editingEvent === event.id) {
                             editingEvent = null;
                             editingEventName = '';
-                            edetingEventDescription = null;
-                            edetingEventDateTime = null;
-                            edetingEventLocation = null;
-                            edetingEventCategoryIds = [];
+                            editingEventDescription = null;
+                            editingEventDateTime = null;
+                            editingEventLocation = null;
+                            editingEventCategoryIds = [];
                         } else {
                             editingEvent = event.id;
                             editingEventName = event.name;
-                            edetingEventDescription = event.description;
-                            edetingEventDateTime = event.dateTime;
-                            edetingEventLocation = event.location;
-                            edetingEventCategoryIds = event.CategoryId;
+                            editingEventDescription = event.description;
+                            editingEventDateTime = event.dateTime;
+                            editingEventLocation = event.location;
+                            editingEventCategoryIds = event.CategoryId;
                         }
                     }}
                 >
@@ -195,7 +195,7 @@
                         <label for="eventDescription">Description:</label>
                         <textarea 
                             id="eventDescription" 
-                            bind:value={edetingEventDescription} 
+                            bind:value={editingEventDescription} 
                             placeholder="Enter event description"
                         ></textarea>
                     </div>
@@ -205,7 +205,7 @@
                         <input 
                             type="datetime-local" 
                             id="eventDateTime" 
-                            bind:value={edetingEventDateTime} 
+                            bind:value={editingEventDateTime} 
                             required
                         >
                     </div>
@@ -218,7 +218,7 @@
                                     <input 
                                         type="checkbox" 
                                         value={category.id}
-                                        bind:group={edetingEventCategoryIds}
+                                        bind:group={editingEventCategoryIds}
                                     >
                                     {category.name}
                                 </label>
@@ -231,7 +231,7 @@
                         <input 
                             type="text" 
                             id="eventLocation" 
-                            bind:value={edetingEventLocation} 
+                            bind:value={editingEventLocation} 
                             required 
                             placeholder="Enter event location"
                         >
