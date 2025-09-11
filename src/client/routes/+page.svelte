@@ -2,7 +2,7 @@
 <script>
     import { onMount } from 'svelte';
     import {writable} from 'svelte/store';
-    import {categories, events, setEvents, addEvent, deleteEvent } from '$lib/stores'
+    import {categories, setCategories, events, setEvents} from '$lib/stores'
     import '../app.css'; // from routes/ to app.css
 
 
@@ -13,6 +13,7 @@
 	let eventLocation = '';
     let eventId = null;
 	let selectedCategoryIds = [];
+    let searchTerm = '';
 	
 	
 	function formatLocalDateTime(dateTimeString) {
@@ -21,6 +22,9 @@
         return date.toLocaleString(); 
     }
 
+    $: filteredEvents = $events.filter(event => 
+        event.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     onMount(async () => {
         // Fetch events
@@ -34,6 +38,16 @@
             console.error('Error fetching events:', err);
         }
 
+        try {
+            const categoriesResponse = await fetch('/api/categories');
+            if (categoriesResponse.ok) {
+                const categoriesData = await categoriesResponse.json();
+                setCategories(categoriesData);
+            }
+        } catch (err) {
+            console.error('Error fetching categories:', err);
+        }
+
        
     });
 </script>
@@ -43,9 +57,26 @@
    
     <div>
         <h2>Events</h2>
-        {#if $events.length > 0}
+        <div class="search-container">
+            <input
+            type="text"
+            bind:value={searchTerm}
+            placeholder="Search here..."
+            class="search-input"
+            >
+            {#if searchTerm}
+                <button
+                    type="button"
+                    class="clear-search"
+                    on:click={() => searchTerm = ''}
+                >
+                    X
+                </button>
+            {/if}
+        </div>
+        {#if filteredEvents.length > 0}
          <div>
-            {#each $events as event}
+            {#each filteredEvents as event}
              <div>
                
                 <strong>{event.name}</strong> - {event.description}
@@ -63,4 +94,3 @@
               
     </div>
 </div>
-

@@ -94,11 +94,10 @@
             
             });
              if(response.ok){
-                alert ("was here")
 
                 const alteredEvent = await response.json();
         
-                updateEvent(parseInt(alteredEvent.id), {name : alteredEvent.name})
+                updateEvent(parseInt(alteredEvent.id), {name : alteredEvent.name, description : alteredEvent.description, dateTime : alteredEvent.dateTime, location : alteredEvent.location, CategoryId : alteredEvent.CategoryId})
                 editingEventName = "";
                 //editingEvent = null;
             }
@@ -155,9 +154,9 @@
                             editingEvent = event.id;
                             editingEventName = event.name;
                             editingEventDescription = event.description;
-                            editingEventDateTime = event.dateTime;
+                            editingEventDateTime = new Date(event.dateTime).toISOString().slice(0, 16);
                             editingEventLocation = event.location;
-                            editingEventCategoryIds = event.CategoryId;
+                            editingEventCategoryIds = event.categories ? event.categories.map(cat => cat.id) : [];
                         }
                     }}
                 >
@@ -214,11 +213,11 @@
                         <label for="Addcategories"> Categories (optional):</label>
                         <div class="checkbox-group">
                             {#each $categories as category}
-                                <label class="checkbox-label">
+                                <label class="checkbox-label">           
                                     <input 
-                                        type="checkbox" 
-                                        value={category.id}
-                                        bind:group={editingEventCategoryIds}
+                                    type="checkbox" 
+                                    value={category.id}
+                                    bind:group={editingEventCategoryIds}
                                     >
                                     {category.name}
                                 </label>

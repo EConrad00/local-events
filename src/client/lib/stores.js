@@ -1,7 +1,5 @@
 import { writable } from 'svelte/store';
 
-
-
 // Events store
 export const events = writable([]);
 
