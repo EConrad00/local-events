@@ -2,7 +2,7 @@
 <script>
     import { onMount } from 'svelte';
     import {writable} from 'svelte/store';
-    import {categories, events, setEvents, addEvent, deleteEvent, updateEvent } from '$lib/stores'
+    import {categories, setCategories, events, setEvents, addEvent, deleteEvent, updateEvent } from '$lib/stores'
     import '../../app.css'; 
 
 
@@ -16,6 +16,9 @@
     let editingEvent = null;
     let editingEventName = null;
     let edetingEventDescription = null;
+    let edetingEventDateTime = null;
+    let edetingEventLocation = null;
+    let edetingEventCategoryIds = [];
 	
 	
 	function formatLocalDateTime(dateTimeString) {
@@ -120,15 +123,15 @@
     });
 </script>
 
-<h1>Local Events</h1>
+<h1>Events</h1>
 <div class="container">
    
     <div>
-        <h2>Events</h2>
+        <h2>Current events</h2>
         {#if $events.length > 0}
-         <div>
+        <div>
             {#each $events as event}
-             <div class="checkbox-label">
+            <div class="checkbox-label">
                 <input 
                     type="checkbox"
                     checked={eventId === event.id}
@@ -137,27 +140,35 @@
                 <strong>{event.name}</strong> - {event.description}
                 <br>
                 <small>Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
-            <button
+                <button
                     type="button"
                     class="edit-pen {editingEvent === event.id ? 'active' : ''}"
                     on:click={() => {
                         if (editingEvent === event.id) {
                             editingEvent = null;
                             editingEventName = '';
+                            edetingEventDescription = null;
+                            edetingEventDateTime = null;
+                            edetingEventLocation = null;
+                            edetingEventCategoryIds = [];
                         } else {
                             editingEvent = event.id;
                             editingEventName = event.name;
+                            edetingEventDescription = event.description;
+                            edetingEventDateTime = event.dateTime;
+                            edetingEventLocation = event.location;
+                            edetingEventCategoryIds = event.CategoryId;
                         }
                     }}
                 >
                     ✏️
-            </button>
+                </button>
 
             </div>
             
             {/each}
 
-           </div>
+        </div>
            {#if eventId !=null}
                 <button
                     type="button"
@@ -167,20 +178,72 @@
                     Delete Selected 
                 </button>
             {/if}
-             {#if editingEvent > 0}
+            {#if editingEvent > 0}
+            <h2>Alter event</h2>
                 <form on:submit|preventDefault={alterEvents}>
+                    <div>
+                        <label for="eventName">Event Name:</label>
                         <input 
-                        type="text"  
-                        bind:value={editingEventName} 
-                        required 
-                        placeholder="Enter new event name"
+                            type="text"  
+                            bind:value={editingEventName} 
+                            required 
+                            placeholder="Enter new event name"
                         >
-                        <button class="btn" type="submit" style="margin-top: 10px;">Update Category</button>
-                    </form>
+                    </div>
+
+                    <div>
+                        <label for="eventDescription">Description:</label>
+                        <textarea 
+                            id="eventDescription" 
+                            bind:value={edetingEventDescription} 
+                            placeholder="Enter event description"
+                        ></textarea>
+                    </div>
+
+                    <div>
+                        <label for="eventDateTime">Date & Time:</label>
+                        <input 
+                            type="datetime-local" 
+                            id="eventDateTime" 
+                            bind:value={edetingEventDateTime} 
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="Addcategories"> Categories (optional):</label>
+                        <div class="checkbox-group">
+                            {#each $categories as category}
+                                <label class="checkbox-label">
+                                    <input 
+                                        type="checkbox" 
+                                        value={category.id}
+                                        bind:group={edetingEventCategoryIds}
+                                    >
+                                    {category.name}
+                                </label>
+                            {/each}
+                        </div>
+                    </div>
+                            
+                    <div>
+                        <label for="eventLocation">Location:</label>
+                        <input 
+                            type="text" 
+                            id="eventLocation" 
+                            bind:value={edetingEventLocation} 
+                            required 
+                            placeholder="Enter event location"
+                        >
+                    </div>
+                    <button class="btn" type="submit" style="margin-top: 10px;">Update Event</button>
+                </form>
             {/if}
         {:else}
             <p>No events found.</p>
         {/if}
+        {#if 0 > 1}
+            
         
         <h2>Add New Event</h2>
         <form on:submit|preventDefault={submitEvent}>
@@ -243,6 +306,7 @@
             
             <button type="submit">Create Event</button>
         </form>
+        {/if}
     </div>
 </div>
 
