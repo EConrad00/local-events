@@ -129,12 +129,13 @@
 </script>
 
 <h1>Events</h1>
+
 <div class="container">
    
     <div>
         <h2>Current events</h2>
         {#if $events.length > 0}
-        <div>
+        <div class="div-scroll">
             {#each $events as event}
             <div class="checkbox-label">
                 <input 
@@ -142,17 +143,21 @@
                     checked={eventId === event.id}
                      on:change={(e) => eventId = e.target.checked ? event.id : null}
                 >
-                <strong>{event.name}</strong> - {event.description}
+                <div>
+                <strong>Event: {event.name} </strong>
+                <div class="div-desc"> 
+                Description - {event.description}
+                </div>
                 <br>
-                <small> | Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
-                <br>
-                <small> | Categories: 
+                <small> Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}
+                | Categories: 
                     {#if event.categories && event.categories.length > 0}
                         {event.categories.map(cat => cat.name).join(', ')}
                     {:else}
                         No categories
                     {/if}
                 </small>
+                </div>
                 <button
                     type="button"
                     class="edit-pen {editingEvent === event.id ? 'active' : ''}"
@@ -255,10 +260,12 @@
         {:else}
             <p>No events found.</p>
         {/if}
-        
-        <h2>Add New Event</h2>
+    </div>
+
+    <div style="margin-left: 350px; top: 15px;">
+    <h2>Add New Event</h2>
         <form on:submit|preventDefault={submitEvent}>
-            <div class="right">
+            <div>
                 <label for="eventName">Event Name:</label>
                 <input 
                     type="text" 
