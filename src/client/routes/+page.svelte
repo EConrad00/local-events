@@ -77,20 +77,22 @@
         {#if filteredEvents.length > 0}
          <div>
             {#each filteredEvents as event}
-             <div>
+             <div style="border: 1px solid #ccc; border-radius: 4px;">
                
-                <strong>{event.name}</strong> - {event.description}
-                <br>
-                <small>Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}</small>
-                <br>
-                <small> | Categories: 
+               <div>
+                <strong>Event: {event.name} </strong>
+                <div class="div-desc"> 
+                Description - {event.description}
+                </div>
+                <small> Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}
+                | Categories: 
                     {#if event.categories && event.categories.length > 0}
                         {event.categories.map(cat => cat.name).join(', ')}
                     {:else}
                         No categories
                     {/if}
                 </small>
-
+               </div>
             </div>
             
             {/each}

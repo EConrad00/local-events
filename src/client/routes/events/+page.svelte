@@ -148,7 +148,6 @@
                 <div class="div-desc"> 
                 Description - {event.description}
                 </div>
-                <br>
                 <small> Date: {formatLocalDateTime(event.dateTime)} | Location: {event.location || 'TBD'}
                 | Categories: 
                     {#if event.categories && event.categories.length > 0}
